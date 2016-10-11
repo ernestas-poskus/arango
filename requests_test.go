@@ -26,7 +26,8 @@ func TestRequests(t *testing.T) {
 	db.Run(&ImportCollection{})
 
 	// INDEX
-	db.Run(&CreateHashIndex{})
+	db.Run(&HashIndex{})
+	db.Run(&PersistentIndex{})
 
 	// CACHE
 	db.Run(&SetCacheProperties{})

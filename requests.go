@@ -5,7 +5,6 @@ import (
 	"strconv"
 )
 
-
 // DATABASE
 
 // CreateDatabase creates a new database.
@@ -132,35 +131,6 @@ func (r *TruncateCollection) Generate() []byte {
 	return nil
 }
 
-// INDEX
-
-// CreateHashIndex creates a hash index in database.
-type CreateHashIndex struct {
-	CollectionName string   `json:"-"`
-	Fields         []string `json:"fields,omitempty"`
-	Unique         *bool    `json:"unique,omitempty"`
-	Type           string   `json:"type,omitempty"`
-	Sparse         *bool    `json:"sparse,omitempty"`
-}
-
-func (r *CreateHashIndex) Description() string {
-	return "CREATE HASH INDEX"
-}
-
-func (r *CreateHashIndex) Path() string {
-	return "/_api/index?collection=" + r.CollectionName
-}
-
-func (r *CreateHashIndex) Method() string {
-	return "POST"
-}
-
-func (r *CreateHashIndex) Generate() []byte {
-	r.Type = "hash"
-	m, _ := json.Marshal(r)
-	return m
-}
-
 // CACHE
 
 // SetCacheProperties sets the query cache properties.
@@ -205,23 +175,19 @@ func (r *GetCacheProperties) Generate() []byte {
 	return nil
 }
 
-
-
-
 type CollectionInfo struct {
-	Id string        `json:"id"`
-	Name string       `json:"name"`
-	IsSystem bool       `json:"isSystem"`
-	Status int        `json:"status"`
-	Type int          `json:"type"`
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	IsSystem bool   `json:"isSystem"`
+	Status   int    `json:"status"`
+	Type     int    `json:"type"`
 }
 
 type CollectionInfoList struct {
-	Collections []CollectionInfo    `json:"collections"`
-	Error bool                      `json:"error"`
-	Code int      `json:"code"`
+	Collections []CollectionInfo `json:"collections"`
+	Error       bool             `json:"error"`
+	Code        int              `json:"code"`
 }
-
 
 // ListCollections lists all collections from the current DB
 type ListCollections struct {
@@ -247,7 +213,7 @@ func (c *ListCollections) Generate() []byte {
 // CollectionInfo gets information about the collection
 type GetCollectionInfo struct {
 	CollectionName string
-	IncludeSystem bool
+	IncludeSystem  bool
 }
 
 func (c *GetCollectionInfo) Description() string {
