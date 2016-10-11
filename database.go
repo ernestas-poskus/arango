@@ -96,12 +96,26 @@ func (db *DB) Run(q Runnable) ([]byte, error) {
 		return []byte{}, nil
 	}
 
-	r, err := db.RunAsync(q)
+	r, err := db.RunSync(q)
 	if err != nil {
 		return nil, err
 	}
 
 	return db.syncResult(r), nil
+}
+
+// RunSync runs the Runnable asynchronously and returns an async Result object.
+func (db *DB) RunSync(q Runnable) (*Result, error) {
+	if q == nil {
+		return NewResult(nil), nil
+	}
+
+	c, err := db.send(q.Description(), q.Method(), q.Path(), q.Generate(), false)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewResult(c), nil
 }
 
 // RunAsync runs the Runnable asynchronously and returns an async Result object.
@@ -110,7 +124,7 @@ func (db *DB) RunAsync(q Runnable) (*Result, error) {
 		return NewResult(nil), nil
 	}
 
-	c, err := db.send(q.Description(), q.Method(), q.Path(), q.Generate())
+	c, err := db.send(q.Description(), q.Method(), q.Path(), q.Generate(), true)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +143,7 @@ func (db *DB) Send(description, method, path string, req interface{}) ([]byte, e
 		return nil, err
 	}
 
-	c, err := db.send(description, method, path, body)
+	c, err := db.send(description, method, path, body, true)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +153,7 @@ func (db *DB) Send(description, method, path string, req interface{}) ([]byte, e
 
 // send executes a request at the path passed as argument.
 // It returns a channel where the extracted content of each batch is returned.
-func (db *DB) send(description, method, path string, body []byte) (chan interface{}, error) {
+func (db *DB) send(description, method, path string, body []byte, async bool) (chan interface{}, error) {
 	in := make(chan interface{}, 16)
 	out := make(chan interface{}, 16)
 
@@ -156,6 +170,10 @@ func (db *DB) send(description, method, path string, body []byte) (chan interfac
 		Method(method).
 		AddPath(path).
 		SetQueryParams(db.queryParams(url))
+
+	if async {
+		req.SetHeader("x-arango-async", "true")
+	}
 
 	if body != nil {
 		req.Body(bytes.NewBuffer(body))

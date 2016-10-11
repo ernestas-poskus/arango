@@ -43,13 +43,13 @@ func TestSend(t *testing.T) {
 
 	// The connect params are incorrect
 	db.Connect("", "", "", "")
-	result, err := db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`))
+	result, err := db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`), false)
 	r.Error(err)
 	a.Nil(result)
 
 	// The URL parsing returns an error
 	db.Connect("http://[::1]:namedport", "", "", "")
-	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`))
+	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`), false)
 	r.Error(err)
 	a.Nil(result)
 
@@ -60,7 +60,7 @@ func TestSend(t *testing.T) {
 
 	// Unauthorized access
 	db.Connect("http://database:8000", "dbName", "bar", "foo")
-	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`))
+	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`), false)
 	r.Error(err)
 	r.Contains(err.Error(), "unauthorized")
 	a.Nil(result)
@@ -72,12 +72,12 @@ func TestSend(t *testing.T) {
 
 	// The query is empty and succeeds
 	db.Connect("http://database:8000", "dbName", "foo", "bar")
-	result, err = db.send("TEST", "POST", "/path", []byte{})
+	result, err = db.send("TEST", "POST", "/path", []byte{}, false)
 	r.NoError(err)
 	a.Equal("[]", string((<-result).(json.RawMessage)))
 
 	// The query is nil and succeeds
-	result, err = db.send("TEST", "POST", "/path", nil)
+	result, err = db.send("TEST", "POST", "/path", nil, false)
 	r.NoError(err)
 	a.Equal("[]", string((<-result).(json.RawMessage)))
 
@@ -98,7 +98,7 @@ func TestSend(t *testing.T) {
 
 	// The query is empty and succeeds
 	db.Connect("http://database:8000", "dbName", "foo", "bar")
-	result, err = db.send("TEST", "POST", "/path", []byte{})
+	result, err = db.send("TEST", "POST", "/path", []byte{}, false)
 	r.NoError(err)
 	a.Equal("{\"error\": false}", string((<-result).(json.RawMessage)))
 
@@ -113,7 +113,7 @@ func TestSend(t *testing.T) {
 		BodyString(`{"error": true, "errorMessage": "ERROR !"}`)
 
 	// The database error is returned
-	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`))
+	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`), false)
 	r.Error(err)
 	a.Equal("ERROR_NO_ERROR", err.Error())
 	a.Nil(result)
@@ -130,7 +130,7 @@ func TestSend(t *testing.T) {
 
 	// send doesn't return error but one is returned in the channel as no responder
 	// is listening for the PUT method
-	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`))
+	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`), false)
 	r.NoError(err)
 	a.Equal("[]", string((<-result).(json.RawMessage)))
 	a.Error((<-result).(error))
@@ -146,7 +146,7 @@ func TestSend(t *testing.T) {
 		BodyString(`{"error": true, "errorMessage": "ERROR !", "result": [], "hasMore":false, "id":"1000"}`)
 
 	// The database error is returned in the channel
-	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`))
+	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`), false)
 	r.NoError(err)
 	a.Equal("[]", string((<-result).(json.RawMessage)))
 	a.Equal("ERROR !", (<-result).(error).Error())
@@ -161,7 +161,7 @@ func TestSend(t *testing.T) {
 		BodyString(`{"error": false, "errorMessage": "", "result": [{}], "hasMore":false}`)
 
 	// The database error is returned in the channel
-	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`))
+	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`), false)
 	r.NoError(err)
 	a.Equal("[{}]", string((<-result).(json.RawMessage)))
 	a.Equal("[{}]", string((<-result).(json.RawMessage)))
