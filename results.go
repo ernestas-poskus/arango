@@ -8,6 +8,7 @@ import (
 type result struct {
 	Error        bool            `json:"error"`
 	ErrorMessage string          `json:"errorMessage"`
+	ErrNum       int             `json:"errorNum"`
 	Content      json.RawMessage `json:"result"`
 	Cached       bool            `json:"cached"`
 	HasMore      bool            `json:"hasMore"`
