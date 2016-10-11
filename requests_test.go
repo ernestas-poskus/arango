@@ -33,4 +33,6 @@ func TestRequests(t *testing.T) {
 	db.Run(&SetCacheProperties{})
 	db.Run(&GetCacheProperties{})
 
+	// Count
+	db.Run(NewCount("existing_collection_name"))
 }
