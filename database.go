@@ -104,6 +104,16 @@ func (db *DB) Run(q Runnable) ([]byte, error) {
 	return db.syncResult(r), nil
 }
 
+// RunAndDecode - run and try to decode Response payload into given pointer
+// struct
+func (db *DB) RunAndDecode(q Runnable, ptr interface{}) error {
+	payload, err := db.Run(q)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(payload, ptr)
+}
+
 // RunSync runs the Runnable asynchronously and returns an async Result object.
 func (db *DB) RunSync(q Runnable) (*Result, error) {
 	if q == nil {
