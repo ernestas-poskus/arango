@@ -115,12 +115,12 @@ func TestSend(t *testing.T) {
 	// The database error is returned
 	result, err = db.send("TEST", "POST", "/path", []byte(`{"query":"FOR c IN customer RETURN c"}`))
 	r.Error(err)
-	a.Equal("ERROR !", err.Error())
+	a.Equal("ERROR_NO_ERROR", err.Error())
 	a.Nil(result)
 
 	resultByte, err = db.Send("TEST", "POST", "/path", struct{ query string }{query: "FOR c IN customer RETURN c"})
 	r.Error(err)
-	a.Equal("ERROR !", err.Error())
+	a.Equal("ERROR_NO_ERROR", err.Error())
 	a.Nil(resultByte)
 
 	// A valid database returning a cursor is created

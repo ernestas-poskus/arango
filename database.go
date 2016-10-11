@@ -5,10 +5,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/eapache/go-resiliency/retrier"
@@ -186,19 +186,16 @@ func (db *DB) send(description, method, path string, body []byte) (chan interfac
 	json.Unmarshal(res.Bytes(), result)
 
 	if result.Error {
-		db.l.LogError(result.ErrorMessage, start)
-		switch {
-		case strings.Contains(result.ErrorMessage, "unique constraint violated"):
-			return nil, &ErrUnique{result.ErrorMessage}
-		case strings.Contains(result.ErrorMessage, "not found"):
-			return nil, &ErrNotFound{result.ErrorMessage}
-		case strings.Contains(result.ErrorMessage, "unknown collection"):
-			return nil, &ErrNotFound{result.ErrorMessage}
-		case strings.Contains(result.ErrorMessage, "duplicate name"):
-			return nil, &ErrDuplicate{result.ErrorMessage}
-		default:
-			return nil, errors.New(result.ErrorMessage)
+		db.l.LogError(
+			fmt.Sprintf("ErrorNum %d, ErrorMessage %s", result.ErrNum, result.ErrorMessage),
+			start,
+		)
+
+		err, ok := arangoErrors[result.ErrNum]
+		if ok {
+			return nil, err
 		}
+		return nil, errors.New(result.ErrorMessage)
 	}
 
 	go db.l.LogResult(result.Cached, start, in, out)
