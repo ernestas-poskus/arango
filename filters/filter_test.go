@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestFromJSON runs tests on the arangolite FromJSON method.
+// TestFromJSON runs tests on the arango FromJSON method.
 func TestFromJSON(t *testing.T) {
 	a := assert.New(t)
 	r := require.New(t)
@@ -31,7 +31,7 @@ func TestFromJSON(t *testing.T) {
 	a.EqualValues(18, filter.Where[0]["age"].(map[string]interface{})["gte"])
 }
 
-// TestToAQL runs tests on the arangolite ToAQL method.
+// TestToAQL runs tests on the arango ToAQL method.
 func TestToAQL(t *testing.T) {
 	a := assert.New(t)
 	r := require.New(t)

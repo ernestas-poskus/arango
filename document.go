@@ -1,4 +1,4 @@
-package arangolite
+package arango
 
 // Document represents a basic ArangoDB document
 // Fields are pointers to allow null values in ArangoDB

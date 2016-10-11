@@ -1,4 +1,4 @@
-package arangolite
+package arango
 
 import (
 	"io/ioutil"
@@ -22,9 +22,9 @@ func TestTransactionRun(t *testing.T) {
 	req := []byte{}
 	m := mock.New("http://transaction:8000").Persist().
 		Filter(func(re *http.Request) bool {
-		req, _ = ioutil.ReadAll(re.Body)
-		return true
-	})
+			req, _ = ioutil.ReadAll(re.Body)
+			return true
+		})
 
 	result, err := db.Run(NewTransaction([]string{"foo"}, []string{"bar"}).
 		AddQuery("var1", "FOR c IN customer RETURN c"))

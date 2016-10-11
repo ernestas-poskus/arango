@@ -898,7 +898,7 @@ hash.each do |_, v|
   error_variables[v[:errorsName]] = %{errors.New("#{v[:errorsNew]}")}
 end
 
-puts 'package arangolite'
+puts 'package arango'
 
 puts 'import "errors"'
 

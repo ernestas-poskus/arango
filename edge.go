@@ -1,4 +1,4 @@
-package arangolite
+package arango
 
 // Edge represents a basic ArangoDB edge
 // Fields are pointers to allow null values in ArangoDB

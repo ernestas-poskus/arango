@@ -1,5 +1,5 @@
 // Package arangolite provides a lightweight ArangoDB driver.
-package arangolite
+package arango
 
 import (
 	"bytes"

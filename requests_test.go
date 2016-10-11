@@ -1,4 +1,4 @@
-package arangolite
+package arango
 
 import (
 	"testing"
